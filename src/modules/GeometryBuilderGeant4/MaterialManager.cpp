@@ -90,6 +90,7 @@ void Materials::set(const std::string& name, G4Material* material) { materials_.
  *   - titanium grade 5
  *   - vacuum
  *   - cesium_lead_bromide
+ *   - stainless steel
  */
 void Materials::init_materials() {
     G4NistManager* nistman = G4NistManager::Instance();
@@ -130,6 +131,9 @@ void Materials::init_materials() {
     auto* Pb = nistman->FindOrBuildElement("Pb");
     auto* Cs = nistman->FindOrBuildElement("Cs");
     auto* Br = nistman->FindOrBuildElement("Br");
+    auto* Fe = nistman->FindOrBuildElement("Fe");
+    auto* Cr = nistman->FindOrBuildElement("Cr");
+    auto* Ni = nistman->FindOrBuildElement("Ni");
 
     // Create Epoxy material
     auto* Epoxy = new G4Material("Epoxy", 1.3 * CLHEP::g / CLHEP::cm3, 3);
@@ -233,4 +237,11 @@ void Materials::init_materials() {
     CsPbBr3->AddElement(Pb, 1);
     CsPbBr3->AddElement(Br, 3);
     materials_["cesium_lead_bromide"] = CsPbBr3;
+
+    // Parameters are taken from http://www.azom.com/article.aspx?ArticleID=965
+    auto* stainlessSteel = new G4Material("StainlessSteel", 8 * CLHEP::g / CLHEP::cm3, 3);
+    stainlessSteel->AddElement(Fe, 74);
+    stainlessSteel->AddElement(Cr, 18);
+    stainlessSteel->AddElement(Ni, 8);
+    materials_["stainless_steel"] = stainlessSteel;
 }
