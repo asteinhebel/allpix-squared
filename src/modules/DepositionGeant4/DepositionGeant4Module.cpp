@@ -76,6 +76,7 @@ DepositionGeant4Module::DepositionGeant4Module(Configuration& config, Messenger*
 
     config_.setDefault("source_type", "beam");
     config_.setDefault<bool>("output_plots", false);
+    config_.setDefault<bool>("enable_fluorescence", false);
     config_.setDefault<int>("output_plots_scale", Units::get(100, "ke"));
     config_.setDefault<double>("max_step_length", Units::get(1.0, "um"));
     // Default value chosen to ensure proper gamma generation for Cs137 decay
@@ -337,6 +338,9 @@ void DepositionGeant4Module::initialize() {
     physicsList->SetVerboseLevel(0);
     G4ProcessTable::GetProcessTable()->SetVerboseLevel(0);
     G4EmParameters::Instance()->SetVerbose(0);
+    G4EmParameters::Instance()->SetFluo(config_.get<bool>("enable_fluorescence"));	//enable fluorescence
+    G4EmParameters::Instance()->SetAuger(config_get<bool>("enable_flourescence"));	//enable auger
+    G4EmParameters::Instance()->SetDeexcitationIgnoreCut(config_.get<bool>("enable_flourescence"));	//production threshold for fluorescence and auger electron production
     G4HadronicProcessStore::Instance()->SetVerbose(0);
     G4HadronicParameters::Instance()->SetVerboseLevel(0);
     G4NuclearLevelData::GetInstance()->GetParameters()->SetVerbose(0);
