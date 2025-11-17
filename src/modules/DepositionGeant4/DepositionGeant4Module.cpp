@@ -339,8 +339,8 @@ void DepositionGeant4Module::initialize() {
     G4ProcessTable::GetProcessTable()->SetVerboseLevel(0);
     G4EmParameters::Instance()->SetVerbose(0);
     G4EmParameters::Instance()->SetFluo(config_.get<bool>("enable_fluorescence"));	//enable fluorescence
-    G4EmParameters::Instance()->SetAuger(config_.get<bool>("enable_flourescence"));	//enable auger
-    G4EmParameters::Instance()->SetDeexcitationIgnoreCut(config_.get<bool>("enable_flourescence"));	//production threshold for fluorescence and auger electron production
+    G4EmParameters::Instance()->SetAuger(config_.get<bool>("enable_fluorescence"));	//enable auger
+    G4EmParameters::Instance()->SetDeexcitationIgnoreCut(config_.get<bool>("enable_fluorescence"));	//production threshold for fluorescence and auger electron production
     G4HadronicProcessStore::Instance()->SetVerbose(0);
     G4HadronicParameters::Instance()->SetVerboseLevel(0);
     G4NuclearLevelData::GetInstance()->GetParameters()->SetVerbose(0);
