@@ -106,6 +106,13 @@ def getData_fromRoot(hdf_out, rootObj, detector):
     PixelCharge = rootObj.Get('PixelCharge')
     PixelHit = rootObj.Get('PixelHit')
 
+    #Define lists to eventually store in HDF5
+    list_event=[]
+    list_pdg=[]
+    list_hit_x=[]
+    list_hit_y=[]
+    list_hit_t=[]
+
     #Loop over PixelHit branch and get all relevant information
     for iev in range(0, PixelHit.GetEntries()):
         #Get all info from same event
@@ -127,14 +134,21 @@ def getData_fromRoot(hdf_out, rootObj, detector):
         br_mc_part = getattr(MCParticle, McParticle_branch.GetName())
         br_mc_track = getattr(MCTrack, McTrack_branch.GetName())
 
-        print(iev, br_mc_part.size())
-        input()
+        #Pull variables for saving and hold in arrays
+        for pix_hit in br_pix_hit:
+            list_event.append(iev)
+            #list_pdg.append(id)
+            list_hit_x.append(pix_hit.getPixel().getIndex().x())
+            list_hit_y.append(pix_hit.getPixel().getIndex().y())
+            list_hit_t.append(pix_hit.getGlobalTime())
 
-        #Record MCTrack and MCParticle information
-        for mc_part in br_mc_part:
-            track =mc_part.getTrack() 
-            part = Particle.from_pdgid(mc_part.getParticleID())
-
+    #Insert variable arrays into data dataset. ROOT contents are type cppyy.gbl.std.string
+    dataLength = len(list_event)
+    event_number_dataset = data_group.create_dataset("event_number", (dataLength,), data=list_event)
+    #hit_pdg_dataset = data_group.create_dataset("hit_pdg", (dataLength,), data=list_pdg)
+    hit_x_dataset = data_group.create_dataset("hit_x", (dataLength,), data=list_hit_x)
+    hit_y_dataset = data_group.create_dataset("hit_y", (dataLength,), data=list_hit_y)
+    hit_time_dataset = data_group.create_dataset("hit_time", (dataLength,), data=list_hit_t)
 
     return data_group
 

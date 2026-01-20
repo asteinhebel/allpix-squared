@@ -43,6 +43,8 @@ def main(args):
     print(fin['data'].keys())
     for i in fin['metadata'].keys():
         print(fin['metadata'][i][()])
+    for j in fin['data'].keys():
+        print(fin['data'][j][()])
 
 #################
 # call to main
