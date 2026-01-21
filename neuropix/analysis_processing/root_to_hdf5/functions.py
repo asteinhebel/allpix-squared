@@ -63,7 +63,7 @@ def getData_fromRoot(hdf_out, rootObj, detector):
 
     #Get data information from ROOT file
     #MCTrack = rootObj.Get('MCTrack')
-    #MCParticle = rootObj.Get('MCParticle')
+    MCParticle = rootObj.Get('MCParticle')
     #DepositedCharge = rootObj.Get('DepositedCharge')
     #PixelCharge = rootObj.Get('PixelCharge')
     PixelHit = rootObj.Get('PixelHit')
@@ -80,11 +80,11 @@ def getData_fromRoot(hdf_out, rootObj, detector):
         #Get all info from same event
         PixelHit.GetEntry(iev)
         #PixelCharge.GetEntry(iev)
-        #MCParticle.GetEntry(iev)
+        MCParticle.GetEntry(iev)
         #MCTrack.GetEntry(iev)
         #PixelCharge_branch = PixelCharge.GetBranch(detector)
         PixelHit_branch = PixelHit.GetBranch(detector)
-        #McParticle_branch = MCParticle.GetBranch(detector)
+        McParticle_branch = MCParticle.GetBranch(detector)
         #McTrack_branch = MCTrack.GetBranch("global")
         if (not PixelHit_branch):
             Warning("WARNING: cannot find PixelHit branch in the TTree with detector name: " + detector + ",  exiting")
@@ -93,7 +93,7 @@ def getData_fromRoot(hdf_out, rootObj, detector):
         #Get allpix-squared vectors associated with ROOT branches
         #br_pix_charge = getattr(PixelCharge, PixelCharge_branch.GetName())
         br_pix_hit = getattr(PixelHit, PixelHit_branch.GetName())
-        #br_mc_part = getattr(MCParticle, McParticle_branch.GetName())
+        br_mc_part = getattr(MCParticle, McParticle_branch.GetName())
         #br_mc_track = getattr(MCTrack, McTrack_branch.GetName())
 
         #Pull variables for saving and hold in arrays
@@ -138,11 +138,14 @@ def rootToHDF5(root_file_in, detector:str='timepix', lib_path:str=None):
         #name created file identically to the original ROOT file, just change the extension. Requires creation of a new file
         hdf_out = h5py.File(f'{root_file_in[:-5]}.hdf5', 'x')
     except FileExistsError:
-        #Avoid accidental file trunctation by prompting user confirmation
-        print(f"Output file f'{root_file_in[:-5]}.hdf5 already exists. Press enter to truncate or exit program with ctl+c")
+        #Avoid accidental file overwrite by prompting user confirmation
+        print(f"Output file {root_file_in[:-5]}.hdf5 already exists. Press enter to overwrite or exit program with ctl+c")
         try:
             input()
-            hdf_out = h5py.File(f'{root_file_in[:-5]}.hdf5', 'w') 
+            print(f"Overwriting file {root_file_in[:-5]}.hdf5")
+            #Remove old file and recreate
+            os.remove(f'{root_file_in[:-5]}.hdf5')
+            hdf_out = h5py.File(f'{root_file_in[:-5]}.hdf5', 'x')
         except KeyboardInterrupt:
             return False
 
