@@ -30,6 +30,7 @@ def main(args):
             print("Created output HDF5 file")
         else:
             print("Error occured with HDF5 conversion")
+            sys.exit()
     else:
         print("Unknown input file type")
         sys.exit()
@@ -38,13 +39,17 @@ def main(args):
         import h5py
         #test output hdf5 by printing to terminal
         fin = h5py.File(f'{args.fileIn[:-5]}.hdf5', 'r')
+        print("Found HDF5 contents: ")
         print(fin.keys())
-        print(fin['metadata'].keys())
-        print(fin['data'].keys())
+        print("in METADATA:")
         for i in fin['metadata'].keys():
+            print(i)
             print(fin['metadata'][i][()])
+        print("in DATA:")
         for j in fin['data'].keys():
+            print(j)
             print(fin['data'][j][()])
+        print(f"{len(fin['data']['hit_x'])} pixel hit events")
 
 #################
 # call to main
