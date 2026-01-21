@@ -13,7 +13,6 @@ This is the second step in the expected analysis pipeline.
 
 ## Getting started - setup
 1. Clone code locally
-
 `git clone https://github.com/neuropix-project/dataPipeline.git`
 2. Ensure ROOT is activated, likely by sourcing the activation script `thisroot.sh`. This must be done for each new environment.
 3. Confirm the presence of all required Python packages
