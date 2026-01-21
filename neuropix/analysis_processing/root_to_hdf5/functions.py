@@ -39,44 +39,6 @@ def get_allpixLib(lib_path):
     #load library
     ROOT.gSystem.Load(lib_file_name)
 
-def rootToHDF5_noROOT_metadata(root_file_in):
-    #track success
-    bool_success = True
-
-    #create output HDF5 object
-    try:
-        #name created file identically to the original ROOT file, just change the extension. Requires creation of a new file
-        hdf_out = h5py.File(f'{root_file_in[:-5]}.hdf5', 'x')
-    except FileExistsError:
-        #Avoid accidental file trunctation by prompting user confirmation
-        print(f"Output file f'{root_file_in[:-5]}.hdf5 already exists. Press enter to truncate or exit program with ctl+c")
-        try:
-            input()
-            hdf_out = h5py.File(f'{root_file_in[:-5]}.hdf5', 'w') 
-        except KeyboardInterrupt:
-            return False
-    #create groups for Metadata and Data datasets
-    metadata_group = hdf_out.create_group("metadata")
-
-    #get input trees
-    rootObj = up.open(root_file_in)
-    config_tree = rootObj['config']
-
-    #Pull metadata variables and insert into metadata dataset
-    number_of_events_dataset = metadata_group.create_dataset("number_of_events", (1,), data=float(config_tree['Allpix']['number_of_events']))
-    number_of_particles_dataset = metadata_group.create_dataset("number_of_particles", (1,), data=float(config_tree['DepositionGeant4']['number_of_particles']))
-    particle_type_dataset = metadata_group.create_dataset("particle_type", (1,), data=config_tree['DepositionGeant4']['particle_type'])
-    source_energy_value_dataset = metadata_group.create_dataset("source_energy_value", (1,), data=float(''.join(filter(str.isdigit, config_tree['DepositionGeant4']['source_energy']))))
-    source_energy_units_dataset = metadata_group.create_dataset("source_energy_units", (1,), data=str(''.join(filter(str.isalpha,config_tree['DepositionGeant4']['source_energy']))))
-    threshold_value_dataset = metadata_group.create_dataset("threshold_value", (1,), data=float(''.join(filter(str.isdigit, config_tree['DefaultDigitizer:timepix']['threshold']))))
-    threshold_units_dataset = metadata_group.create_dataset("threshold_units", (1,), data=str(''.join(filter(str.isalpha,config_tree['DefaultDigitizer:timepix']['threshold']))))
-    threshold_smearing_dataset = metadata_group.create_dataset("threshold_smearing", (1,), data=float(config_tree['DefaultDigitizer:timepix']['threshold_smearing']))
-    tdc_offset_dataset = metadata_group.create_dataset("tdc_offset", (1,), data=config_tree['DefaultDigitizer:timepix']['tdc_offset'])
-
-    #Save groups to output HDF5
-    hdf_out.flush()
-    return bool_success
-
 def getMetadata_fromRoot(hdf_out, config_dir):
 
     #create hdf5 group
@@ -185,9 +147,3 @@ def rootToHDF5(root_file_in, detector:str='timepix', lib_path:str=None):
     #Save groups to output HDF5
     hdf_out.flush()
     return bool_success
-
-def writeArray(arr, delimeter="\t"):
-    out_str = ""
-    for i in arr:
-        out_str+=str(i)+delimeter
-    return out_str+"\n"
