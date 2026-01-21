@@ -21,6 +21,6 @@ This is the second step in the expected analysis pipeline.
 
 ## Running the code
 1. Identify the location of the ROOT file you wish to convert and the Allpix-Squared library file `libAllpixObjects.so` (likely in `...allpix-squared/lib/`)
-2. Run the code like:
-`python root_to_hdf5.py -d <path to library file > -f <path to ROOT file>` 
+2. Run the code like:  
+`python root_to_hdf5.py -d <path to library file > -f <path to ROOT file>`   
 By default, an HDF5 file with the same name as the original ROOT file will be created in the directory where the executable is saved. This can be changed with the commandline argument `-o`. Run `python root_to_hdf5.py -h` to see all input options.
