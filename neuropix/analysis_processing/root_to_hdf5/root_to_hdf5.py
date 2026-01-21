@@ -3,7 +3,7 @@
 #   Run like: python root_to_hdf5.py -f <input ROOT file for conversion> -d <path to allpix library>
 #       
 #   Input = Required: (-f) ROOT file created by Allpix-Squared
-#           Required: (-d) Path to Allpix-Squared library file
+#           Required: (-l) Path to Allpix-Squared library file
 #           Optional: (-o) Path to directory for output HDF5 file
 #           Optional: (-d) Boolean argument to display diagnostics of resulting HDF5 file
 #
@@ -11,7 +11,7 @@
 #
 #######################
 
-import sys, argparse
+import sys, os, argparse
 import functions
 
 #################
@@ -28,7 +28,7 @@ def main(args):
     #read input file
     if args.fileIn[-4:]=='root':
         print("Converting ROOT to HDF5")
-        hdf_success = functions.rootToHDF5(args.fileIn, lib_path=args.libAllpixObjects)
+        hdf_success = functions.rootToHDF5(args.fileIn, args.dirOut, lib_path=args.libAllpixObjects)
         if hdf_success:
             print("Created output HDF5 file")
         else:
@@ -41,7 +41,7 @@ def main(args):
     if args.diagnostics:
         import h5py
         #test output hdf5 by printing to terminal
-        fin = h5py.File(f'{args.fileIn[:-5]}.hdf5', 'r')
+        fin = h5py.File(f'{args.dirOut}{args.fileIn.split('/')[-1][:-5]}.hdf5', 'r')
         print("Found HDF5 contents: ")
         print(fin.keys())
         print("in METADATA:")
@@ -62,7 +62,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(prog='rootToHdf5',
         description='Convert ROOT output from Allpix-squared to HDF5 file with only NEUROPix-relevant variables retained')
     parser.add_argument('-f', '--fileIn', required=True, help="Path to input ROOT file. Only accepts one file at a time.")    
-    parser.add_argument('-o', '--dirOut', default='./', help="Path to output directory where HDF5 will be saved. Defaults to directory where this script lives.")  
+    parser.add_argument('-o', '--dirOut', default=os.path.dirname(os.path.realpath(__file__)), help="Path to output directory where HDF5 will be saved. Defaults to directory where this script lives.")  
     parser.add_argument('-l', '--libAllpixObjects', required=False, help="Path to the libAllpixObjects library (generally in allpix-squared/lib/)) ")
     parser.add_argument('-d','--diagnostics', required=False, action='store_true', help="If given, will run diagnostics on the output HDF5 to confirm that it was created and populated as expected.")
 

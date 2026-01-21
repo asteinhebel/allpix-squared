@@ -125,7 +125,7 @@ def getData_fromRoot(hdf_out, rootObj, detector):
 
     return data_group
 
-def rootToHDF5(root_file_in, detector:str='timepix', lib_path:str=None):
+def rootToHDF5(root_file_in, hdf_dir_out, detector:str='timepix', lib_path:str=None):
     #track success
     bool_success = True
 
@@ -135,16 +135,18 @@ def rootToHDF5(root_file_in, detector:str='timepix', lib_path:str=None):
     #create output HDF5 object
     try:
         #name created file identically to the original ROOT file, just change the extension. Requires creation of a new file
-        hdf_out = h5py.File(f'{root_file_in[:-5]}.hdf5', 'x')
+        fOut = f'{hdf_dir_out}{root_file_in.split('/')[-1][:-5]}.hdf5'
+        print(f"creating {fOut}")
+        hdf_out = h5py.File(fOut, 'x')
     except FileExistsError:
         #Avoid accidental file overwrite by prompting user confirmation
-        print(f"Output file {root_file_in[:-5]}.hdf5 already exists. Press enter to overwrite or exit program with ctl+c")
+        print(f"Output file {fOut} already exists. Press enter to overwrite or exit program with ctl+c")
         try:
             input()
-            print(f"Overwriting file {root_file_in[:-5]}.hdf5")
+            print(f"Overwriting file {fOut}")
             #Remove old file and recreate
-            os.remove(f'{root_file_in[:-5]}.hdf5')
-            hdf_out = h5py.File(f'{root_file_in[:-5]}.hdf5', 'x')
+            os.remove(fOut)
+            hdf_out = h5py.File(fOut, 'x')
         except KeyboardInterrupt:
             return False
 
