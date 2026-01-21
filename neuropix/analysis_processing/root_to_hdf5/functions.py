@@ -62,10 +62,10 @@ def getData_fromRoot(hdf_out, rootObj, detector):
     data_group = hdf_out.create_group("data")
 
     #Get data information from ROOT file
-    MCTrack = rootObj.Get('MCTrack')
-    MCParticle = rootObj.Get('MCParticle')
-    DepositedCharge = rootObj.Get('DepositedCharge')
-    PixelCharge = rootObj.Get('PixelCharge')
+    #MCTrack = rootObj.Get('MCTrack')
+    #MCParticle = rootObj.Get('MCParticle')
+    #DepositedCharge = rootObj.Get('DepositedCharge')
+    #PixelCharge = rootObj.Get('PixelCharge')
     PixelHit = rootObj.Get('PixelHit')
 
     #Define lists to eventually store in HDF5
@@ -79,27 +79,38 @@ def getData_fromRoot(hdf_out, rootObj, detector):
     for iev in range(0, PixelHit.GetEntries()):
         #Get all info from same event
         PixelHit.GetEntry(iev)
-        PixelCharge.GetEntry(iev)
-        MCParticle.GetEntry(iev)
-        MCTrack.GetEntry(iev)
-        PixelCharge_branch = PixelCharge.GetBranch(detector)
+        #PixelCharge.GetEntry(iev)
+        #MCParticle.GetEntry(iev)
+        #MCTrack.GetEntry(iev)
+        #PixelCharge_branch = PixelCharge.GetBranch(detector)
         PixelHit_branch = PixelHit.GetBranch(detector)
-        McParticle_branch = MCParticle.GetBranch(detector)
-        McTrack_branch = MCTrack.GetBranch("global")
-        if (not PixelCharge_branch):
-            Warning("WARNING: cannot find PixelCharge branch in the TTree with detector name: " + detector + ",  exiting")
+        #McParticle_branch = MCParticle.GetBranch(detector)
+        #McTrack_branch = MCTrack.GetBranch("global")
+        if (not PixelHit_branch):
+            Warning("WARNING: cannot find PixelHit branch in the TTree with detector name: " + detector + ",  exiting")
             exit(1)
 
         #Get allpix-squared vectors associated with ROOT branches
-        br_pix_charge = getattr(PixelCharge, PixelCharge_branch.GetName())
+        #br_pix_charge = getattr(PixelCharge, PixelCharge_branch.GetName())
         br_pix_hit = getattr(PixelHit, PixelHit_branch.GetName())
-        br_mc_part = getattr(MCParticle, McParticle_branch.GetName())
-        br_mc_track = getattr(MCTrack, McTrack_branch.GetName())
+        #br_mc_part = getattr(MCParticle, McParticle_branch.GetName())
+        #br_mc_track = getattr(MCTrack, McTrack_branch.GetName())
 
         #Pull variables for saving and hold in arrays
         for pix_hit in br_pix_hit:
+            #get particle name that caused the hit (primary particle)
+            primary_id_arr = [p.getParticleID()*p.isPrimary() for p in pix_hit.getMCParticles() if p.getParticleID()*p.isPrimary()!=0]
+            #should have identically one primary
+            if len(primary_id_arr)!=1:
+                #May have more than one primary OR (more likely) no primaries. Typically have no primaries when hit associated with an electron from the charge cloud
+                #Use placeholder PDG ID==0 for hits with no or multiple primaries
+                primary_id=0
+            else:
+                primary_id = primary_id_arr[0]
+
+            #save to arrays
             list_event.append(iev)
-            #list_pdg.append(id)
+            list_pdg.append(primary_id)
             list_hit_x.append(pix_hit.getPixel().getIndex().x())
             list_hit_y.append(pix_hit.getPixel().getIndex().y())
             list_hit_t.append(pix_hit.getGlobalTime())
@@ -107,7 +118,7 @@ def getData_fromRoot(hdf_out, rootObj, detector):
     #Insert variable arrays into data dataset. ROOT contents are type cppyy.gbl.std.string
     dataLength = len(list_event)
     event_number_dataset = data_group.create_dataset("event_number", (dataLength,), data=list_event)
-    #hit_pdg_dataset = data_group.create_dataset("hit_pdg", (dataLength,), data=list_pdg)
+    hit_pdg_dataset = data_group.create_dataset("hit_pdg", (dataLength,), data=list_pdg)
     hit_x_dataset = data_group.create_dataset("hit_x", (dataLength,), data=list_hit_x)
     hit_y_dataset = data_group.create_dataset("hit_y", (dataLength,), data=list_hit_y)
     hit_time_dataset = data_group.create_dataset("hit_time", (dataLength,), data=list_hit_t)
