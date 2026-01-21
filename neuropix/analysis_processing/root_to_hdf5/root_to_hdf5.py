@@ -1,10 +1,13 @@
 #######################
 #
-#   Run like:
+#   Run like: python root_to_hdf5.py -f <input ROOT file for conversion> -d <path to allpix library>
 #       
-#   Input = 
+#   Input = Required: (-f) ROOT file created by Allpix-Squared
+#           Required: (-d) Path to Allpix-Squared library file
+#           Optional: (-o) Path to directory for output HDF5 file
+#           Optional: (-d) Boolean argument to display diagnostics of resulting HDF5 file
 #
-#   Output =
+#   Output = One HDF5 file with the same name as the input ROOT file stored in the same folder as this executable OR at the path provided with commandline option -o
 #
 #######################
 

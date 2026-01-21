@@ -125,7 +125,6 @@ def getData_fromRoot(hdf_out, rootObj, detector):
 
     return data_group
 
-
 def rootToHDF5(root_file_in, detector:str='timepix', lib_path:str=None):
     #track success
     bool_success = True
